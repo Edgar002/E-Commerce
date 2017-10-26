@@ -9,14 +9,8 @@
     <header>Fourth-Dimensional Pocket</header>
     <div class="content">
         <nav class="menu">
-                <p>Categories</p>
-                <ui>
-                        <li><a href="main.html">Travel</a></li>
-                        <li><a href="weapon.html">Weapon</a></li>
-                        <li><a href="main.html">Crime</a></li>
-                        <li><a href="main.html">Mind Control</a></li>
-                        <li><a href="main.html">Food</a></li>
-                </ui>            
+            <p>Categories</p>
+            <ui id="menuList"></ui>        
         </nav>
         <section>
                 <section class="dropdown">
@@ -34,21 +28,56 @@
     
                 </section>    
                 <hr>
-                <p><a href = "home.html">Home</a> > <a href = "main.html">Travel</a> > <a href = "product.html">Dokodemo Door</a></p>
-                <div class="product">
-                        <img src="images/Dd.png"></img>
-                        <div>
-                            <p>Dokodemo Door</p>
-                            <table>
-                                <tr><td><p>$ 550</p></td> <td><button>Add to Cart</button></td>
-                            </table>
-                            <p>One needs to say where they want to go, then they can open the door and go through it to reach their destination.</p> 
-                        </div>
+                <p><a href = "main.html">Home</a> > <a href = "main.html">Travel</a> > <a href = "product.html">Dokodemo Door</a></p>
+                <div class="product" id ="product">
                 </div>
             
         </section>
         
     </div>
-    <footer>Doraemon</footer> 
+    <footer>Doraemon</footer>
+    <script type="text/javascript" src="incl/myLib.js"></script>
+    <script type="text/javascript">
+    (function(){
+    
+        function updateUI() {
+            myLib.get({action:'cat_fetchall'}, function(json){
+                // loop over the server response json
+                //   the expected format (as shown in Firebug): 
+                for (var listItems = [],i = 0, cat; cat = json[i]; i++) {
+                    //<li><a href="weapon.html">Weapon</a></li>
+                    //listItems.push('<li id="cat' , parseInt(cat.catid) , '"><span class="name">' , cat.name.escapeHTML() , '</span> <span class="delete">[Delete]</span> <span class="edit">[Edit]</span></li>');
+                    listItems.push('<li id="cat',parseInt(cat.catid),'"><span class="name">',cat.name.escapeHTML(),'</span></li>');
+                }
+                el('menuList').innerHTML = listItems.join('');
+            });
+                
+        }
+        function updateProduct(){
+            var xmlHttp = new XMLHttpRequest();
+            url = window.location.href;
+            str = url.split('?pid=');
+            pid = str[1];
+			xmlHttp.onreadystatechange = function() { 
+				if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                    result = xmlHttp.responseText.split('while(1);');
+					result = JSON.parse(result[1]);
+                    result = result["success"];
+		
+                    for (var listItems = [], i = 0, prod; prod = result[i]; i++) {
+                        listItems.push('<img src="incl/img/',parseInt(result[0].pid),'.jpg"></img><div><p>',result[0].name.escapeHTML(),'</p><table><tr><td><p>$ ',parseInt(result[0].price),'</p></td> <td><button>Add to Cart</button></td></table><p>',result[0].decription,'</p></div>');
+                    }
+                    el('product').innerHTML = listItems.join('');
+                }
+			}
+			xmlHttp.open("GET", "product.php?action=prod_fetchone&pid="+pid, true); // true for asynchronous 
+            xmlHttp.send();
+        }
+    updateUI();
+    updateProduct();    
+        
+    
+    })();
+    </script> 
     </body>
     </html>

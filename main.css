@@ -38,7 +38,7 @@ input{
     font-size: 25px;
     margin-left: 8px;
 }
-.menu ui{
+.menu ul{
     margin: 0;
     padding: 0;
 }
@@ -58,21 +58,21 @@ input{
     background-color: #555;
     color: white;
 }
-.products li img{
+#products li img{
     width:200px;
     height:200px
 }
 
-.products li a{
+#products li a{
     display:block;
 }
 
-.products {
+#products {
     display: flex;
     flex-wrap:wrap;
 }
 
-.product-list{
+#product-list{
     margin:50px;
 }
 .content {
