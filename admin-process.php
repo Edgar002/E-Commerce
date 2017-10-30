@@ -85,9 +85,9 @@ function ierg4210_prod_insert() {
 	//$lastId = $db->lastInsertId();
 	// Copy the uploaded file to a folder which can be publicly accessible at incl/img/[pid].jpg
 	if ($_FILES["file"]["error"] == 0
-		&& $_FILES["file"]["type"] == "image/jpeg"
-		&& mime_content_type($_FILES["file"]["tmp_name"]) == "image/jpeg"
-		&& $_FILES["file"]["size"] < 1000000) {
+		&& ($_FILES["file"]["type"] == "image/jpeg" || $_FILES["file"]["type"] == "image/png" || $_FILES["file"]["type"] == "image/gif" )
+		&& (mime_content_type($_FILES["file"]["tmp_name"]) == "image/jpeg" || mime_content_type($_FILES["file"]["tmp_name"]) == "image/png" || mime_content_type($_FILES["file"]["tmp_name"]) == "image/gif")
+		&& $_FILES["file"]["size"] <= 10485760) {
 		
 		$q->execute(array($_POST['catid'],$_POST['name'],$_POST['price'],$_POST['description']));
 		$lastId = $db->lastInsertId();
@@ -150,11 +150,11 @@ function ierg4210_prod_edit() {
 	$q->execute(array($_POST['catid'],$_POST['name'],$_POST['price'],$_POST['description'],$_POST['pid']));
 
 	if ($_FILES["file"]["error"] == 0
-	&& $_FILES["file"]["type"] == "image/jpeg"
-	&& mime_content_type($_FILES["file"]["tmp_name"]) == "image/jpeg"
-	&& $_FILES["file"]["size"] < 1000000) {		
+	&& ($_FILES["file"]["type"] == "image/jpeg" || $_FILES["file"]["type"] == "image/png" || $_FILES["file"]["type"] == "image/gif" )
+	&& (mime_content_type($_FILES["file"]["tmp_name"]) == "image/jpeg" || mime_content_type($_FILES["file"]["tmp_name"]) == "image/png" || mime_content_type($_FILES["file"]["tmp_name"]) == "image/gif")
+	&& $_FILES["file"]["size"] <= 10485760) {		
 		// Note: Take care of the permission of destination folder (hints: current user is apache)
-		if (move_uploaded_file($_FILES["file"]["tmp_name"], "incl/img/" . array($_POST['pid']) . ".jpg")) {
+		if (move_uploaded_file($_FILES["file"]["tmp_name"], "incl/img/" . $_POST['pid'] . ".jpg")) {
 		// redirect back to original page; you may comment it during debug
 			header('Location: admin.html');
 			exit();
@@ -162,8 +162,15 @@ function ierg4210_prod_edit() {
 	}
 	// Only an invalid file will result in the execution below
 	// To replace the content-type header which was json and output an error message
-	header('Location: admin.html');
-	exit();	
+	if($_FILES["file"]["type"] == null){
+		header('Location: admin.html');
+		exit();	
+	}
+	else {
+		header('Content-Type: text/html; charset=utf-8');
+		echo 'Invalid file detected. <br/><a href="javascript:history.back();">Back to admin panel.</a>';
+		exit();
+	}	
 }
 
 
