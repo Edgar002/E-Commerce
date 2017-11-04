@@ -52,6 +52,7 @@
                         jsonData.value = e.target.value;
                         localStorage.setItem(id , JSON.stringify(jsonData));   
                     }
+                    total = total.toFixed(1);
                     localStorage.setItem('total' , total);
                     el("totalbtn").innerHTML = Number(total);
                     el("totallist").innerHTML = Number(total);
@@ -147,20 +148,18 @@
             if(jsonData){
                 jsonData.value++;
                 localStorage.setItem(id, JSON.stringify(jsonData));
-                localStorage.setItem('total', Number(total) + Number(price));
-                el("totalbtn").innerHTML = Number(total) + Number(price);
-                el("totallist").innerHTML = Number(total) + Number(price);
                 var str = "quantity"+id;
                 el(str).value++; 
             }
             else{
                 localStorage.setItem(id, JSON.stringify({id : id ,value : 1 ,name : name, price : price}));
                 el("shoppingList").innerHTML += '<tr id="row'+id+'" ><td>- '+name.escapeHTML() +'</td> <td>Quantity: <input type="number" id="quantity'+id+'"  class="quantity" min="0" value=1> @$<span class="price">'+Number(price)+'</span></td></tr>';
-                localStorage.setItem('total', Number(total) + Number(price));
-                el("totalbtn").innerHTML = Number(total) + Number(price);
-                el("totallist").innerHTML = Number(total) + Number(price);
                 $(".quantity").change(function(e){changeDetect(e);});
             }
+            total = Number(total) + Number(price);
+            localStorage.setItem('total', total.toFixed(1));
+            el("totalbtn").innerHTML =total.toFixed(1);
+            el("totallist").innerHTML = total.toFixed(1);
             
         }
     }

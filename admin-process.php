@@ -74,7 +74,7 @@ function ierg4210_prod_insert() {
 		throw new Exception("invalid-name");
 	if (!preg_match('/^[\d\.]+$/', $_POST['price']))
 		throw new Exception("invalid-price");
-	if (!preg_match('/^[\w\- ]+$/', $_POST['description']))
+	if (!preg_match('/^[\w\- ]*$/', $_POST['description']))
 		throw new Exception("invalid-text");
 	
 	$sql="INSERT INTO products (catid, name, price, decription) VALUES (?, ?, ?, ?);";
@@ -135,7 +135,7 @@ function ierg4210_prod_edit() {
 		throw new Exception("invalid-name");
 	if (!preg_match('/^[\d\.]+$/', $_POST['price']))
 		throw new Exception("invalid-price");
-	if (!preg_match('/^[\w\- ]+$/', $_POST['description']))
+	if (!preg_match('/^[\w\- ]*$/', $_POST['description']))
 		throw new Exception("invalid-text");
 	
 	$sql="UPDATE products SET catid = ? , name = ? , price = ? , decription = ?  WHERE pid = ?;";

@@ -72,7 +72,7 @@ input{
     flex-wrap:wrap;
 }
 
-#product-list{
+.product-list{
     margin:50px;
 }
 

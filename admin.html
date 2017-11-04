@@ -48,10 +48,10 @@
 			<div><input id="prod_insert_name" type="text" name="name" required="true" pattern="^[\w\- ]+$" /></div>
 
 			<label for="prod_insert_price">Price *</label>
-			<div><input id="prod_insert_price" type="number" name="price" required="true" pattern="^[\d\.]+$" /></div>
+			<div><input id="prod_insert_price" type="text" name="price" required="true" pattern="^[\d\.]+$" /></div>
 
 			<label for="prod_insert_description">Description</label>
-			<div><textarea id="prod_insert_description" name="description" pattern="^[\w\- ]$"></textarea></div>
+			<div><textarea id="prod_insert_description" name="description" pattern="^[\w\- ]*$"></textarea></div>
 
 			<label for="prod_insert_name">Image *</label>
 			<div><input type="file" name="file" required="true" accept="image/jpeg" /></div>
@@ -82,10 +82,10 @@
 			<div><input id="prod_edit_name" type="text" name="name" required="true" pattern="^[\w\- ]+$" /></div>
 
 			<label for="prod_edit_price">Price *</label>
-			<div><input id="prod_edit_price" type="number" name="price" required="true" pattern="^[\d\.]+$" /></div>
+			<div><input id="prod_edit_price" type="text" name="price" required="true" pattern="^[\d\.]+$" /></div>
 
 			<label for="prod_edit_description">Description</label>
-			<div><textarea id="prod_edit_description" name="description" pattern="^[\w\- ]$"></textarea></div>
+			<div><textarea id="prod_edit_description" name="description" pattern="^[\w\- ]*$"></textarea></div>
 
 			<label for="prod_insert_name">Image</label>
 			<div><img id="prod_edit_image" src=""></img></div>
@@ -194,7 +194,7 @@
 					result = result["success"];					
 					for (var listItems = [], i = 0, prod; prod = result[i]; i++) {
 						listItems.push('<li id="prod' , parseInt(prod.pid) , '"><span class="name">' , prod.name.escapeHTML() , 
-						'</span> <span class="price hide">' , parseInt(prod.price) , '</span> <span class="catid hide">' , parseInt(prod.catid) , 
+						'</span> <span class="price hide">' , Number(prod.price) , '</span> <span class="catid hide">' , parseInt(prod.catid) , 
 						'</span> <span class="description hide">' ,  prod.decription.escapeHTML() , '</span> <span class="delete">[Delete]</span> <span class="edit">[Edit]</span></li>');
 					}
 					el('productList').innerHTML = listItems.join('');
@@ -215,18 +215,19 @@
 	}
 
 	el('prod_insert').onsubmit = function() {
+		form = this;
 		for (var i = 0, p, el, els = form.elements; el = els[i]; i++) {
 			// bypass any disabled controls
 			if (el.disabled) continue;
 			// validate empty field, radio and checkboxes
 			if (el.hasAttribute('required')) {
 				if( el.value == ''){
-					alert("invalid input"); 
+					alert("missing input: "+el.name); 
 					return false;
 				}	
 			}
-			if (el.name!='description'&&(p = el.getAttribute('pattern')) && !new RegExp(p).test(el.value)){
-				alert("invalid input"); 
+			if (p = el.getAttribute('pattern') && new RegExp(p).test(el.value)){
+				alert("invalid input: "+el.name);  
 				return false;
 			}
 		}
@@ -242,18 +243,19 @@
 	}
 
 	el('prod_edit').onsubmit = function() {
+		form = this;
 		for (var i = 0, p, el, els = form.elements; el = els[i]; i++) {
 			// bypass any disabled controls
 			if (el.disabled) continue;
 			// validate empty field, radio and checkboxes
 			if (el.hasAttribute('required')) {
 				if(el.value == ''){
-					alert("invalid input"); 
+					alert("missing input: "+el.name); 
 					return false;
 				}	
 			}
-			if ((el.name!='description')&&(p = el.getAttribute('pattern')) && !new RegExp(p).test(el.value)){
-				alert("invalid input"); 
+			if (p = el.getAttribute('pattern') && new RegExp(p).test(el.value)){
+				alert("invalid input: "+el.name); 
 				return false;
 			}
 		}
