@@ -1,16 +1,6 @@
 <?php
     session_start();
     include_once('auth-process.php');
-    $t = ierg4210_auth_token();
-    echo $t;
-    if($t[0] == "admin"){
-        header('Location: main.html', true,302);
-        exit();
-    }
-    if($t[0] == "user"){
-        header('Location: admin.html', true,302);
-        exit();
-    }
 
     function ierg4210_login() 
     {
