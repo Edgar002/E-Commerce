@@ -13,7 +13,12 @@ function ierg4210_cat_fetchall() {
 }
 
 function ierg4210_prod_fetchone() {
-    $_GET['pid'] = (int) $_GET['pid'];
+
+	// input validation or sanitization
+	if (!preg_match('/^\d*$/', $_GET['pid']))
+	throw new Exception("invalid-pid");
+	$_GET['pid'] = (int) $_GET['pid'];
+	
 	// DB manipulation
 	global $db;
 	$db = ierg4210_DB();

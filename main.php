@@ -22,6 +22,12 @@ function ierg4210_prod_fetchall() {
 }
 
 function ierg4210_prod_fetchbycat() {
+	
+	// input validation or sanitization
+	if (!preg_match('/^\d*$/', $_GET['catid']))
+	throw new Exception("invalid-catid");
+	$_GET['catid'] = (int) $_GET['catid'];
+
 	// DB manipulation
 	global $db;
 	$db = ierg4210_DB();

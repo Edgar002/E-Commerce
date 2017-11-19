@@ -1,5 +1,11 @@
 <?php
+session_start();
 include_once('lib/db.inc.php');
+include_once('auth-process.php');
+
+if(!ierg4210_auth_token()){
+	header('Location: login.php');
+}
 
 function ierg4210_cat_fetchall() {
 	// DB manipulation
@@ -11,6 +17,12 @@ function ierg4210_cat_fetchall() {
 }
 
 function ierg4210_prod_fetchall() {
+	
+	// input validation or sanitization
+	if (!preg_match('/^\d*$/', $_GET['catid']))
+	throw new Exception("invalid-catid");
+	$_GET['catid'] = (int) $_GET['catid'];
+
 	// DB manipulation
 	global $db;
 	$db = ierg4210_DB();
@@ -37,8 +49,11 @@ function ierg4210_cat_edit() {
 	// input validation or sanitization
 	if(!preg_match( '/^[\w\-,]+$/' ,$_POST['name']))
 		throw new Exception("invalid-name");
-
+	// input validation or sanitization
+	if (!preg_match('/^\d*$/', $_POST['catid']))
+	throw new Exception("invalid-catid");
 	$_POST['catid'] = (int) $_POST['catid'];
+
 
 	global $db;
 	$db = ierg4210_DB();
@@ -49,6 +64,8 @@ function ierg4210_cat_edit() {
 function ierg4210_cat_delete() {
 
 	// input validation or sanitization
+	if (!preg_match('/^\d*$/', $_POST['catid']))
+	throw new Exception("invalid-catid");
 	$_POST['catid'] = (int) $_POST['catid'];
 
 	// DB manipulation
@@ -110,6 +127,8 @@ function ierg4210_prod_insert() {
 
 function ierg4210_prod_delete() {	
 		// input validation or sanitization
+		if (!preg_match('/^\d*$/', $_POST['pid']))
+		throw new Exception("invalid-pid");
 		$_POST['pid'] = (int) $_POST['pid'];
 	
 		// DB manipulation

@@ -4,6 +4,21 @@
 	<meta charset="utf-8" />
 	<title>IERG4210 Shop - Admin Panel</title>
 	<link href="incl/admin.css" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript">
+		var xmlHttp = new XMLHttpRequest();
+					xmlHttp.onreadystatechange = function() { 
+						if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+							result = xmlHttp.responseText.split('while(1);');
+							result = JSON.parse(result[1]);
+							result = result["success"];
+							if(!result){
+								window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/login.php";
+							}		
+						}
+					}
+		xmlHttp.open("GET", "auth-process.php?action=auth_token", false); // true for asynchronous 
+		xmlHttp.send();
+	</script>
 </head>
 
 <body>
