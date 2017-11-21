@@ -16,7 +16,6 @@ function ierg4210_auth($email,$password) {
         //expected format: $pw=hash_hmac('sha1', $plainPW, $salt);
         $saltPassword = hash_hmac('sha1', $password, $r['salt']);
 
-        echo $saltPassword;
         if($saltPassword == $r['password']){
             $exp = time() + 3600 * 24 * 3; // 3days
             $token = array(
@@ -30,6 +29,7 @@ function ierg4210_auth($email,$password) {
             
             //put it also in the session
             $_SESSION['t4210'] = $token;
+            $_SESSION['t4210']['type']=$r['type'];
             
             return $r['type'];
         }
@@ -42,11 +42,18 @@ function ierg4210_auth($email,$password) {
 
 }
 
+function ierg4210_auth_admin(){
+    session_start();
+    if($_SESSION['t4210']['type']=='admin')
+        return true;
+    else
+        return false;    
+}
+
 function ierg4210_auth_token(){
     session_start();
     global $db;
     $db = ierg4210_DB();
-    
     if(!empty($_SESSION['t4210']))
         return $_SESSION['t4210']['em'];
     if(!empty($COOKIE['t4210'])){
@@ -59,8 +66,9 @@ function ierg4210_auth_token(){
             if($r=$q->fetch()){
                 //expected format: $pw=hash_hmac('sha1', $exp.$PW, $salt);
                 $realk = hash_hmac('sha1', $t['exp'].$r['password'], $r['salt']);
-                if($realk == $t['k'] && $r['type'] == 'admin'){
+                if($realk == $t['k']){
                     $_SESSION['t4210'] = $t;
+                    $_SESSION['t4210'] = $r['type'];
                     return $t['em'];
                 }
             }
@@ -70,16 +78,56 @@ function ierg4210_auth_token(){
     return false;    
 }
 
+function csrf_getNonce($action){
+    // Generate a nonce with mt_rand()
+    $nonce = mt_rand() . mt_rand();
+    
+    // With regard to $action, save the nonce in $_SESSION 
+    if (!isset($_SESSION['csrf_nonce'])) 
+        $_SESSION['csrf_nonce'] = array();
+    $_SESSION['csrf_nonce'][$action] = $nonce;
+    
+    // Return the nonce
+    return $nonce;
+}
+
+// Check if the nonce returned by a form matches with the stored one.
+function csrf_verifyNonce($action, $receivedNonce){
+    // We assume that $REQUEST['action'] is already validated
+    if (isset($receivedNonce) && $_SESSION['csrf_nonce'][$action] == $receivedNonce) {
+        if ($_SESSION['authtoken']==null)
+            unset($_SESSION['csrf_nonce'][$action]);
+        return true;
+    }
+    return false;
+}
+
+function ierg4210_logout() {
+    session_start();
+    // clear the cookies and session
+    session_destroy();
+}
+
 
 // The following calls the appropriate function based to the request parameter $_REQUEST['action'],
 //   (e.g. When $_REQUEST['action'] is 'cat_insert', the function ierg4210_cat_insert() is called)
-// the return values of the functions are then encoded in JSON format and used as output
 if($_REQUEST['action']=='auth_token') {
   
     $returnVal = call_user_func('ierg4210_' . $_REQUEST['action']);
-       
     echo  'while(1);' . json_encode(array('success' =>$returnVal));
-    
+    exit();
+}
+
+if($_REQUEST['action']=='logout') {
+     call_user_func('ierg4210_' . $_REQUEST['action']);
+     echo  'while(1);';
+     exit();
+}
+
+if($_REQUEST['action']=='csrf_getNonce') {
+    call_user_func('ierg4210_' . $_REQUEST['action']);
+    echo  'while(1);';
+    exit();
 }
 
 ?>

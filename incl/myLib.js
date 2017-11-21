@@ -130,6 +130,11 @@ window.el = function(A) {
 		param.rnd =  new Date().getTime(); // to avoid caching in IE
 		myLib.processJSON('admin-process.php?' + encodeParam(param), null, successCallback);
 	};
+	myLib.getMain = function(param, successCallback) {
+		param = param || {};
+		param.rnd =  new Date().getTime(); // to avoid caching in IE
+		myLib.processJSON('main.php?' + encodeParam(param), null, successCallback);
+	};
 	// To send an action to the admin-process.php over AJAX
 	myLib.post = function(param, successCallback) {
 		myLib.processJSON('admin-process.php?rnd=' + new Date().getTime(), param, successCallback, {method:'POST'});

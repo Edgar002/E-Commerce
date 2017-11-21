@@ -1,7 +1,9 @@
 fieldset{width:310px}
 form label{clear:left;float:left;width:90px;line-height:29px}
 form div{padding:4px 0}
-input[type=text],input[type=password],select,textarea{width:200px}
+input[type=email],input[type=password],select,textarea{width:200px}
+
+.box{width: 200px;}
 
 #login{margin:0px}
 

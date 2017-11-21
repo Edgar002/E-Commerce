@@ -3,6 +3,12 @@ form label{clear:left;float:left;width:90px;line-height:29px}
 form div{padding:4px 0}
 input[type=text],input[type=number],select,textarea{width:200px}
 
+#headerbar > h1 { display:inline-block;margin: auto;}
+#main {margin-top: 25px;}
+#userInfo{position: relative;display: flex;float:right;margin-right: 8px;}
+#username{margin-right: 10px;}
+#logoutbtn{align-self: center;}
+
 #categoryPanel,#categoryEditPanel{float:left;width:350px;border-right:1px solid #CCC}
 #productPanel,#productEditPanel{float:left;padding-left:10px}
 

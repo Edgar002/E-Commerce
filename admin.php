@@ -1,28 +1,33 @@
-<!DOCTYPE html>
+<?php
+	session_start();
+	include_once('auth-process.php');
+	if(!ierg4210_auth_token()){
+		header('Location: login.php');
+		exit();
+	}
+	if(!ierg4210_auth_admin()){
+		header('Location: main.html');
+		echo 'while(1);false';
+		exit();
+	} 
+?>
 <html>
 <head>
 	<meta charset="utf-8" />
 	<title>IERG4210 Shop - Admin Panel</title>
 	<link href="incl/admin.css" rel="stylesheet" type="text/css"/>
-	<script type="text/javascript">
-		var xmlHttp = new XMLHttpRequest();
-					xmlHttp.onreadystatechange = function() { 
-						if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
-							result = xmlHttp.responseText.split('while(1);');
-							result = JSON.parse(result[1]);
-							result = result["success"];
-							if(!result){
-								window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/login.php";
-							}		
-						}
-					}
-		xmlHttp.open("GET", "auth-process.php?action=auth_token", false); // true for asynchronous 
-		xmlHttp.send();
-	</script>
 </head>
 
 <body>
-<h1>IERG4210 Shop - Admin Panel (Demo)</h1>
+<div id="headerbar">
+		
+	<h1>IERG4210 Shop - Admin Panel (Demo)</h1>
+	<div id="userInfo">
+			<p id ="username"><?php echo $_SESSION['t4210']['em']?></p> 
+			<button id="logoutbtn">Logout</button>
+	</div>
+	
+</div>
 <article id="main">
 
 <section id="categoryPanel">
@@ -31,7 +36,7 @@
 		<form id="cat_insert" method="POST" action="admin-process.php?action=cat_insert" onsubmit="return false;">
 			<label for="cat_insert_name">Name</label>
 			<div><input id="cat_insert_name" type="text" name="name" required="true" pattern="^[\w\- ]+$" /></div>
-
+			<input type="hidden" name="nonce" value="<?php echo csrf_getNonce('cat_insert'); ?>"/>
 			<input type="submit" value="Submit" />
 		</form>
 	</fieldset>
@@ -47,6 +52,7 @@
 			<label for="cat_edit_name">Name</label>
 			<div><input id="cat_edit_name" type="text" name="name" required="true" pattern="^[\w\- ]+$" /></div>
 			<input type="hidden" id="cat_edit_catid" name="catid" />
+			<input type="hidden" name="nonce" value="<?php echo csrf_getNonce('cat_edit'); ?>"/>
 			<input type="submit" value="Submit" /> <input type="button" id="cat_edit_cancel" value="Cancel" />
 		</form>
 	</fieldset>
@@ -71,6 +77,7 @@
 			<label for="prod_insert_name">Image *</label>
 			<div><input type="file" name="file" required="true" accept="image/jpeg" /></div>
 
+			<input type="hidden" name="nonce" value="<?php echo csrf_getNonce('prod_insert'); ?>"/>
 			<input type="submit" value="Submit" />
 		</form>
 	</fieldset>
@@ -107,6 +114,8 @@
 			<div><input type="file" name="file" accept="image/jpeg"/></div>
 			
 			<input type="hidden" id="prod_edit_pid" name="pid" />
+			<input type="hidden" name="nonce" value="<?php echo csrf_getNonce('prod_edit'); ?>"/>
+
 			<input type="submit" value="Submit" /> <input type="button" id="prod_edit_cancel" value="Cancel" />
 		</form>
 	</fieldset>
@@ -287,6 +296,17 @@
 		// toggle the edit/view display
 		el('productEditPanel').hide();
 		el('productPanel').show();
+	}
+
+	el('logoutbtn').onclick = function() {
+		var xmlHttp = new XMLHttpRequest();
+					xmlHttp.onreadystatechange = function() { 
+						if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+							window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/login.php";
+						}
+					}
+		xmlHttp.open("GET", "auth-process.php?action=logout", true); // true for asynchronous 
+		xmlHttp.send();
 	}
 
 })();

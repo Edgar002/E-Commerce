@@ -5,9 +5,39 @@
     <script type="text/javascript" src="incl/jquery-3.2.1.min.js"></script>
     <meta charset="UTF-8">
     <title>Fourth-Dimensional Pocket</title>  
+    <script type="text/javascript">
+        if( window.location == "http://18.220.52.77/main.html"){
+            window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/index.html";
+        }
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                        result = xmlHttp.responseText.split('while(1);');
+                        result = JSON.parse(result[1]);
+                        result = result["success"];	
+                        if(result){
+                            el("username").innerHTML = result;
+			                el('logoutbtn').show();
+                        }
+                        else{
+                            el("username").innerHTML = "Guest";
+			                el('loginbtn').show();
+                        }		
+                    }
+        }            
+        xmlHttp.open("GET", "auth-process.php?action=auth_token", true); // true for asynchronous 
+        xmlHttp.send();
+    </script>
 </head>
 <body>
-    <header>Fourth-Dimensional Pocket</header>
+    <div id="headerbar">
+        <header>Fourth-Dimensional Pocket</header>
+        <div id="userInfo">
+            <p id ="username"></p> 
+            <button id="loginbtn" class="hide">Login</button>
+            <button id="logoutbtn" class="hide">Logout</button>
+        </div>
+    </div>
     <div class="content">
         <nav class="menu">
             <p>Categories</p>
@@ -33,11 +63,7 @@
 <footer>Doraemon</footer>
 <script type="text/javascript" src="incl/myLib.js"></script>
 <script type="text/javascript">
-if( window.location == "http://18.220.52.77/main.html"){
-    window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/index.html";
-}
 (function(){
-
     function changeDetect(e){
                     id = e.target.id.replace(/^quantity/, '');
                     var total = localStorage.getItem('total');
@@ -62,9 +88,8 @@ if( window.location == "http://18.220.52.77/main.html"){
     };
 
 	function updateUI() {
-		myLib.get({action:'cat_fetchall'}, function(json){
-			// loop over the server response json
-            //   the expected format (as shown in Firebug): 
+        
+		myLib.getMain({action:'cat_fetchall'}, function(json){
 			for (var listItems = [],i = 0, cat; cat = json[i]; i++) {
                 listItems.push('<li id="cat',parseInt(cat.catid),'"><a href = "main.html?catid='+ parseInt(cat.catid) +'"><span class="name">',cat.name.escapeHTML(),'</span></a></li>');
 			}
@@ -165,6 +190,21 @@ if( window.location == "http://18.220.52.77/main.html"){
             el("totallist").innerHTML = total.toFixed(1);
             
         }
+    }
+
+    el('loginbtn').onclick = function(e) {
+		window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/login.php";
+    }
+
+    el('logoutbtn').onclick = function(e) {
+		var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function() { 
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                        location.reload();
+                    }	
+                }
+            xmlHttp.open("GET", "auth-process.php?action=logout", true); // true for asynchronous 
+            xmlHttp.send();
     }
     	
 })();
