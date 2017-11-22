@@ -4,10 +4,17 @@
     <link rel="stylesheet" href="incl/product.css" type="text/css">
     <script type="text/javascript" src="incl/jquery-3.2.1.min.js"></script>
     <meta charset="UTF-8">
-    <title>Fourth-Dimensional Pocket</title>  
+    <title>Fourth-Dimensional Pocket</title>
 </head>
 <body>
-    <header>Fourth-Dimensional Pocket</header>
+    <div id="headerbar">
+        <header>Fourth-Dimensional Pocket</header>
+        <div id="userInfo">
+            <p id ="username"></p> 
+            <button id="loginbtn" class="hide">Login</button>
+            <button id="logoutbtn" class="hide">Logout</button>
+        </div>
+    </div>
     <div class="content">
         <nav class="menu">
             <p>Categories</p>
@@ -35,33 +42,13 @@
     </div>
     <footer>Doraemon</footer>
     <script type="text/javascript" src="incl/myLib.js"></script>
+    <script type="text/javascript" src="incl/component.js"></script>
     <script type="text/javascript">
     (function(){
 
-        function changeDetect(e){
-                    id = e.target.id.replace(/^quantity/, '');
-                    var total = localStorage.getItem('total');
-                    var jsonData = JSON.parse(localStorage.getItem(id));
-                    quantity = jsonData.value;
-                    price = e.target.parentNode.querySelector('.price').innerHTML;
-                    total -= Number(price) * Number(quantity);
-                    if(e.target.value == 0){
-                        localStorage.removeItem(id);
-                        var str = "row"+id;
-                        el(str).remove();
-                    }
-                    else{
-                        total += Number(price) *  Number(e.target.value);
-                        jsonData.value = e.target.value;
-                        localStorage.setItem(id , JSON.stringify(jsonData));   
-                    }
-                    localStorage.setItem('total', total.toFixed(1));
-                    el("totalbtn").innerHTML =total.toFixed(1);
-                    el("totallist").innerHTML = total.toFixed(1);
-        };
-    
         function updateUI() {
-            myLib.get({action:'cat_fetchall'}, function(json){
+    
+            myLib.getMain({action:'cat_fetchall'}, function(json){
                 // loop over the server response json
                 //   the expected format (as shown in Firebug): 
                 for (var listItems = [],i = 0, cat; cat = json[i]; i++) {
@@ -69,23 +56,6 @@
                 }
                 el('menuList').innerHTML = listItems.join('');
                 updateContent();
-                var total = localStorage.getItem('total');
-                if(total){
-                    el("totalbtn").innerHTML = Number(total);
-                    el("totallist").innerHTML = Number(total);
-                    for(var i = 0; i < localStorage.length; i++) {
-                        if(localStorage.key(i) != 'total'){
-                            var jsonData = JSON.parse(localStorage.getItem(localStorage.key(i)));
-                            el("shoppingList").innerHTML += '<tr id="row'+jsonData.id+'" ><td>- '+jsonData.name.escapeHTML() +'</td> <td>Quantity: <input type="number" id="quantity'+jsonData.id+'"  class="quantity" min="0" value='+parseInt(jsonData.value) +'> @$<span class="price">'+Number(jsonData.price)+'</span></td></tr>';
-                        }
-                    }
-                    $(".quantity").change(function(e){changeDetect(e);});   
-                }
-                else{
-                    localStorage.setItem('total', 0);
-                    el("totalbtn").innerHTML = 0;
-                    el("totallist").innerHTML = 0;
-                }
             });
                 
         }
@@ -105,49 +75,20 @@
                         var str = "cat"+result[0].catid;
                         var target = el(str);
                         name = target.querySelector('.name').innerHTML;
-                        el('path').innerHTML += '<a href = "main.html?catid='+ result[0].catid +'">' + name.escapeHTML() + '</a>  >  ';
-                        el('path').innerHTML += '<a href = "product.html?pid='+ pid +'">' + result[0].name.escapeHTML() + '</a>';
+                        el('path').innerHTML += '<a href = "main.html?catid='+ parseInt(result[0].catid) +'">' + name.escapeHTML() + '</a>  >  ';
+                        el('path').innerHTML += '<a href = "product.html?pid='+ parseInt(pid) +'">' + result[0].name.escapeHTML() + '</a>';
 
                         for (var listItems = [], i = 0, prod; prod = result[i]; i++) {
-                            listItems.push('<img src="incl/img/',parseInt(result[0].pid),'.jpg"></img><div><p class="name">',result[0].name.escapeHTML(),'</p><table><tr><td><p>$ <span class="price">',Number(result[0].price),'</span></p></td> <td id="prod',parseInt(result[0].pid),'"><button>Add to Cart</button></td></tr></table><p>',result[0].decription,'</p></div>');
+                            listItems.push('<img src="incl/img/',parseInt(result[0].pid),'.jpg"></img><div><p class="name">',result[0].name.escapeHTML(),'</p><table><tr><td><p>$ <span class="price">',Number(result[0].price),'</span></p></td> <td id="prod',parseInt(result[0].pid),'"><button>Add to Cart</button></td></tr></table><p>',result[0].decription.escapeHTML(),'</p></div>');
                         }
                         el('product').innerHTML = listItems.join('');
                     }
                 }
-                xmlHttp.open("GET", "product.php?action=prod_fetchone&pid="+pid, true); // true for asynchronous 
+                xmlHttp.open("GET", "product.php?action=prod_fetchone&pid="+parseInt(pid), true); // true for asynchronous 
                 xmlHttp.send();
         }    
-    updateUI();
+        updateUI();
 
-    el('product').onclick = function(e) {
-		if (e.target.tagName == 'BUTTON'){
-		    var target = e.target,
-			id = target.parentNode.id.replace(/^prod/, ''),
-			name = el('product').querySelector('.name').innerHTML;
-            price = el('product').querySelector('.price').innerHTML;
-            var jsonData = JSON.parse(localStorage.getItem(id));
-            var total = localStorage.getItem('total');
-            if(jsonData){
-                jsonData.value++;
-                localStorage.setItem(id, JSON.stringify(jsonData));
-                var str = "quantity"+id;
-                el(str).value++; 
-            }
-            else{
-                localStorage.setItem(id, JSON.stringify({id : id ,value : 1 ,name : name, price : price}));
-                el("shoppingList").innerHTML += '<tr id="row'+id+'" ><td>- '+name.escapeHTML() +'</td> <td>Quantity: <input type="number" id="quantity'+id+'"  class="quantity" min="0" value=1> @$<span class="price">'+Number(price)+'</span></td></tr>';
-                $(".quantity").change(function(e){changeDetect(e);});
-            }
-
-            total = Number(total) + Number(price);
-            localStorage.setItem('total', total.toFixed(1));
-            el("totalbtn").innerHTML =total.toFixed(1);
-            el("totallist").innerHTML = total.toFixed(1);
-            
-        }
-    }
-
-    
     })();
     </script> 
     </body>

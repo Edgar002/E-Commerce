@@ -11,6 +11,13 @@ header{
     margin-left:8px;
 }
 
+#headerbar > header { display:inline-block;margin: auto;}
+#userInfo{position: relative;display: flex;float:right;margin-right: 8px;}
+#username{margin-right: 10px;}
+#loginbtn{align-self: center;}
+#logoutbtn{align-self: center;}
+.hide{display:none}
+
 body {
     display:flex;
     flex-direction: column;

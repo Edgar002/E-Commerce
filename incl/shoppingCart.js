@@ -1,3 +1,4 @@
+
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.onreadystatechange = function() { 
     if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
@@ -11,3 +12,4 @@ xmlHttp.onreadystatechange = function() {
 }
 xmlHttp.open("GET", "auth-process.php?action=auth_token", false); // true for asynchronous 
 xmlHttp.send();
+
