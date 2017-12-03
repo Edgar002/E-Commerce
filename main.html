@@ -28,7 +28,18 @@
                         <div class="dropdown-content">
                             <p>Shopping List ( Total:$<span id="totallist"></span>)</p>
                             <table id="shoppingList"></table>
-                            <button>Checkout</button>        
+                            <form  id="cart_submit" method="POST" action="https://www.sandbox.paypal.com/cgi-bin/webscr" onsubmit="return false">
+                                <ul id="shoppingCartList"></ul>
+                                <input type="hidden"  name="cmd" value="_cart"/>
+                                <input type="hidden"  name="upload" value="1"/>
+                                <input type="hidden"  name="business" value="edgar6a28-facilitator@yahoo.com.hk"/>
+                                <input type="hidden"  name="currency_code" value="HKD"/>
+                                <input type="hidden"  name="charset" value="utf-8"/>
+                                <input type="hidden"  name="custom" value="0"/>
+                                <input type="hidden"  name="invoice" value="0"/>
+                                <input type="hidden"  name="upload" value="1"/>
+                                <input id="btncheckout" type="submit" value="Checkout" />
+                            </form>    
                         </div>    
 
                 </section>    
@@ -83,17 +94,46 @@
     }
 
     el('products').onclick = function(e) {
-    if (e.target.tagName == 'BUTTON'){
-    
-        var target = e.target,
-        id = target.parentNode.id.replace(/^prod/, ''),
-        name = target.parentNode.querySelector('.name').innerHTML;
-        price = target.parentNode.querySelector('.price').innerHTML;
-        updateShoppingCart(id,name,price);
+        if (e.target.tagName == 'BUTTON'){
         
+            var target = e.target,
+            id = target.parentNode.id.replace(/^prod/, ''),
+            name = target.parentNode.querySelector('.name').innerHTML;
+            price = target.parentNode.querySelector('.price').innerHTML;
+            updateShoppingCart(id,name,price);
+            
+        }
     }
-}
+    el('cart_submit').onsubmit = function() {
+        form = this;
+        var buyList={};
+        for(var i = 0; i < localStorage.length; i++) {
+            if(localStorage.key(i) != 'total'){
+                var jsonData = JSON.parse(localStorage.getItem(localStorage.key(i)));
+                buyList[localStorage.key(i)]=parseInt(jsonData.value); 
+            }
+        }
 
+        //alert(JSON.stringify(buyList));
+      
+        myLib.processJSON(
+            "checkout-process.php",                                     
+            {action: "handle_checkout", list:JSON.stringify(buyList)},   
+            function(returnValue){                                      
+                form.custom.value=returnValue.digest;
+                form.invoice.value=returnValue.invoice;
+                form.submit();
+
+                for(var i = 0; i < localStorage.length; i++) 
+                    Storage.removeItem(localStorage.getItem(localStorage.key(i))); //remove local storage
+                       
+            },
+            {method:"POST"});   
+        
+        return false;
+    }    
+		
+	
     updateUI();   	
 })();
 

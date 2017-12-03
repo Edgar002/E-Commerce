@@ -24,6 +24,7 @@ if(total){
         if(localStorage.key(i) != 'total'){
             var jsonData = JSON.parse(localStorage.getItem(localStorage.key(i)));
             el("shoppingList").innerHTML += '<tr id="row'+parseInt(jsonData.id)+'" ><td>- '+jsonData.name.escapeHTML() +'</td> <td>Quantity: <input type="number" id="quantity'+parseInt(jsonData.id)+'"  class="quantity" min="0" value='+parseInt(jsonData.value) +'> @$<span class="price">'+Number(jsonData.price)+'</span></td></tr>';
+            //el("shoppingCartList").innerHTML += '<li> <input type="hidden"  name="item_name_'+parseInt(jsonData.id)+'" value="'+jsonData.name.escapeHTML() +'"/> <input type="hidden"  name="quantity_'+parseInt(jsonData.id)+'" value="'+parseInt(jsonData.value)+'"/>  <input type="hidden"  name="amount_'+parseInt(jsonData.id)+'" value="'+Number(jsonData.price) +'"/> </li>';
         }
     }
     $(".quantity").change(function(e){changeDetect(e);});   
@@ -71,6 +72,7 @@ function updateShoppingCart(id,name,price){
     else{
         localStorage.setItem(id, JSON.stringify({id : id ,value : 1 ,name : name, price : price}));
         el("shoppingList").innerHTML += '<tr id="row'+id+'" ><td>- '+name.escapeHTML() +'</td> <td>Quantity: <input type="number" id="quantity'+id+'"  class="quantity" min="0" value=1> @$<span class="price">'+Number(price)+'</span></td></tr>';
+        //el("shoppingCartList").innerHTML += '<li> <input type="hidden"  name="item_name_'+parseInt(jsonData.id)+'" value="'+name.escapeHTML() +'"/> <input type="hidden"  name="quantity_'+parseInt(jsonData.id)+'" value="1"/> <input type="hidden"  name="amount_'+parseInt(jsonData.id)+'" value="'+Number(price) +'"/> </li>';
         $(".quantity").change(function(e){changeDetect(e);});
     }
 
