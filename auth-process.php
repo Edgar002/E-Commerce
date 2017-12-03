@@ -95,7 +95,7 @@ function csrf_getNonce($action){
 function csrf_verifyNonce($action, $receivedNonce){
     // We assume that $REQUEST['action'] is already validated
     if (isset($receivedNonce) && $_SESSION['csrf_nonce'][$action] == $receivedNonce) {
-        if ($_SESSION['authtoken']==null)
+        if ($_SESSION['t4210']==null)
             unset($_SESSION['csrf_nonce'][$action]);
         return true;
     }
@@ -105,6 +105,7 @@ function csrf_verifyNonce($action, $receivedNonce){
 function ierg4210_logout() {
     session_start();
     // clear the cookies and session
+    setcookie('t4210','',time()-3600);
     session_destroy();
 }
 

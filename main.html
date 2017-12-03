@@ -5,11 +5,6 @@
     <script type="text/javascript" src="incl/jquery-3.2.1.min.js"></script>
     <meta charset="UTF-8">
     <title>Fourth-Dimensional Pocket</title>  
-    <script type="text/javascript">
-        if( window.location == "http://18.220.52.77/main.html"){
-            window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/index.html";
-        }
-    </script>
 </head>
 <body>
     <div id="headerbar">
@@ -86,6 +81,19 @@
         }
         xmlHttp.send();    
     }
+
+    el('products').onclick = function(e) {
+    if (e.target.tagName == 'BUTTON'){
+    
+        var target = e.target,
+        id = target.parentNode.id.replace(/^prod/, ''),
+        name = target.parentNode.querySelector('.name').innerHTML;
+        price = target.parentNode.querySelector('.price').innerHTML;
+        updateShoppingCart(id,name,price);
+        
+    }
+}
+
     updateUI();   	
 })();
 

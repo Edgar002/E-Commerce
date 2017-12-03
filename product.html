@@ -89,29 +89,11 @@
         }    
         el('product').onclick = function(e) {
             if (e.target.tagName == 'BUTTON'){
-                var target = e.target,
-                id = target.parentNode.id.replace(/^prod/, ''),
+                var target = e.target;
+                id = target.parentNode.id.replace(/^prod/, '');
                 name = el('product').querySelector('.name').innerHTML;
                 price = el('product').querySelector('.price').innerHTML;
-                var jsonData = JSON.parse(localStorage.getItem(id));
-                var total = localStorage.getItem('total');
-                if(jsonData){
-                    jsonData.value++;
-                    localStorage.setItem(id, JSON.stringify(jsonData));
-                    var str = "quantity"+id;
-                    el(str).value++; 
-                }
-                else{
-                    localStorage.setItem(id, JSON.stringify({id : id ,value : 1 ,name : name, price : price}));
-                    el("shoppingList").innerHTML += '<tr id="row'+id+'" ><td>- '+name.escapeHTML() +'</td> <td>Quantity: <input type="number" id="quantity'+id+'"  class="quantity" min="0" value=1> @$<span class="price">'+Number(price)+'</span></td></tr>';
-                    $(".quantity").change(function(e){changeDetect(e);});
-                }
-
-                total = Number(total) + Number(price);
-                localStorage.setItem('total', total.toFixed(1));
-                el("totalbtn").innerHTML =total.toFixed(1);
-                el("totallist").innerHTML = total.toFixed(1);
-                
+                updateShoppingCart(id,name,price);
             }
         }
         updateUI();
