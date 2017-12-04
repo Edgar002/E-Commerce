@@ -28,7 +28,7 @@
                         <div class="dropdown-content">
                             <p>Shopping List ( Total:$<span id="totallist"></span>)</p>
                             <table id="shoppingList"></table>
-                            <form  id="cart_submit" method="POST" action="https://www.sandbox.paypal.com/cgi-bin/webscr" onsubmit="return false">
+                            <form  id="cart_submit" method="POST" action="https://www.sandbox.paypal.com/cgi-bin/webscr" onsubmit="return cartSubmit(this)">
                                 <ul id="shoppingCartList"></ul>
                                 <input type="hidden"  name="cmd" value="_cart"/>
                                 <input type="hidden"  name="upload" value="1"/>
@@ -70,7 +70,7 @@
                         result = JSON.parse(result[1]);
                         result = result["success"];				
                         for (var listItems = [], i = 0, prod; prod = result[i]; i++) {
-                            listItems.push('<li class="product-list" id= prod',parseInt(prod.pid),'><a href = "product.html?pid=',parseInt(prod.pid),'"><img src="incl/img/',parseInt(prod.pid),'.jpg"></img></a><a href = "product.html?pid=',parseInt(prod.pid),'"><p class = name>',prod.name.escapeHTML(),'</p></a><p>$ <span class = price>',Number(prod.price),'</span></p><button>Add to Cart</button></li>');
+                            listItems.push('<li class="product-list" id= prod',parseInt(prod.pid),'><a href = "product.html?pid=',parseInt(prod.pid),'"><img src="incl/img/',parseInt(prod.pid),'.jpg"></img></a><a href = "product.html?pid=',parseInt(prod.pid),'"><p class = name>',prod.name.escapeHTML(),'</p></a><p>$ <span class = price>',parseFloat(prod.price),'</span></p><button>Add to Cart</button></li>');
                         }
                         el('products').innerHTML = listItems.join('');
                     }	
@@ -104,31 +104,48 @@
             
         }
     }
-    el('cart_submit').onsubmit = function() {
-        form = this;
+    cartSubmit=function(form){
         var buyList={};
+        el("shoppingCartList").innerHTML = "";
+        var count = 1;
         for(var i = 0; i < localStorage.length; i++) {
             if(localStorage.key(i) != 'total'){
                 var jsonData = JSON.parse(localStorage.getItem(localStorage.key(i)));
                 buyList[localStorage.key(i)]=parseInt(jsonData.value); 
+                el("shoppingCartList").innerHTML += '<li> <input type="hidden"  name="item_name_'+  count +'" value="'+jsonData.name.escapeHTML() +'"/> <input type="hidden"  name="item_number_'+ count+'" value="'+parseInt(jsonData.id) +'"/> <input type="hidden"  name="quantity_'+ count+'" value="'+parseInt(jsonData.value)+'"/>  <input type="hidden"  name="amount_'+ count+'" value="'+parseFloat(jsonData.price) +'"/> </li>';
+                count++;
             }
         }
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                result = xmlHttp.responseText.split('while(1);');
+                result = JSON.parse(result[1]);
+                result = result["success"];	
+                if(result){            
+                  
+                    myLib.processJSON(
+                        "checkout-process.php",                                     
+                        {action: "handle_checkout", list:JSON.stringify(buyList)},   
+                        function(returnValue){                                      
+                            form.custom.value=returnValue.digest;
+                            form.invoice.value=returnValue.invoice;
+                            form.submit();
 
-        //alert(JSON.stringify(buyList));
-      
-        myLib.processJSON(
-            "checkout-process.php",                                     
-            {action: "handle_checkout", list:JSON.stringify(buyList)},   
-            function(returnValue){                                      
-                form.custom.value=returnValue.digest;
-                form.invoice.value=returnValue.invoice;
-                form.submit();
-
-                for(var i = 0; i < localStorage.length; i++) 
-                    Storage.removeItem(localStorage.getItem(localStorage.key(i))); //remove local storage
-                       
-            },
-            {method:"POST"});   
+                            for(var i = 0; i < localStorage.length; i++) 
+                                localStorage.removeItem(localStorage.getItem(localStorage.key(i))); //remove local storage
+                                   
+                        },
+                        {method:"POST"});   
+                    
+                }
+                else{
+                    window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/login.php";
+                }		
+            }
+        }            
+        xmlHttp.open("GET", "auth-process.php?action=auth_token", true); // true for asynchronous 
+        xmlHttp.send();
         
         return false;
     }    
