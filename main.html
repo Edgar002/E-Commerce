@@ -126,7 +126,7 @@
                   
                     myLib.processJSON(
                         "checkout-process.php",                                     
-                        {action: "handle_checkout", list:JSON.stringify(buyList)},   
+                        {action: "handle_checkout", list:JSON.stringify(buyList), userId: result },   
                         function(returnValue){                                      
                             form.custom.value=returnValue.digest;
                             form.invoice.value=returnValue.invoice;

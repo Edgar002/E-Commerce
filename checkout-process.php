@@ -5,6 +5,8 @@
     
     function ierg4210_handle_checkout(){
         $list=json_decode($_REQUEST['list']);
+        $userId = $_REQUEST['userId'];
+        
         
         $pid=array();
         $quantity=array();
@@ -14,7 +16,7 @@
         foreach ($list as $key => $value) {
             $pid[$i]= (int)$key;                      
             $quantity[$i]= (int)$value;
-            $pidQuantity = $pidQuantity.((int)$pid[$i]). ((int)$quantity[$i]);
+            $pidQuantity = $pidQuantity.((int)$key). ((int)$value);
             $i++;
         }
        global $db;
@@ -32,15 +34,15 @@
         $i=0;
         foreach($products as $product){
             $currentPrice=$currentPrice.((float)$product["price"]);
-            $totalPrice+=$product["price"]*$quantity[$i++];
+            $totalPrice += ((float)$product["price"]) * ((int)$quantity[$i++]);
         }
         $digest=sha1($currency. $email. $salt. $pidQuantity . $currentPrice. $totalPrice);
         
         $db = order_DB();
         //$query="INSERT INTO orders (digest, tid , salt) VALUES ($digest, "notyet", $salt)";
-        $q = $db->prepare("INSERT INTO orders (digest , salt , tid) VALUES (?, ?, ?)");
+        $q = $db->prepare("INSERT INTO orders (digest , salt , tid, userid) VALUES (?, ?, ?, ?)");
 
-        $q->execute(array($digest , $salt , "notyet"));
+        $q->execute(array($digest , $salt , "notyet", $userId));
         
         $invoice=$db->lastInsertId();
         $returnValue=array("digest"=>$digest, "invoice"=>$invoice);
@@ -71,8 +73,11 @@
 			if ($db && $db->errorCode()) 
 				error_log(print_r($db->errorInfo(), true));
 			echo json_encode(array('failed'=>'1'));
-		}
-		echo  'while(1);' . json_encode(array('success' => $returnVal));
+        }
+        if($returnVal == false) echo json_encode(array('failed'=>'invalid-username'));
+
+        else   echo  'while(1);' . json_encode(array('success' => $returnVal));
+        
 	} catch(PDOException $e) {
 		error_log($e->getMessage(),0);
 		echo json_encode(array('failed'=>'error-db'));

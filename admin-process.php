@@ -32,6 +32,15 @@
 			return $q->fetchAll();
 	}
 
+	function ierg4210_order_fetchall() {
+		// DB manipulation
+		global $db;
+		$db = order_DB();
+		$q = $db->prepare("SELECT * FROM orders ORDER BY oid DESC LIMIT 50;");
+		if ($q->execute())
+			return $q->fetchAll();
+	}
+
 	function ierg4210_prod_fetchall() {
 		
 		// input validation or sanitization

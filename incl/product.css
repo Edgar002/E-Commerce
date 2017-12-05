@@ -96,9 +96,10 @@ input{
     width:100%;
 }
 
-.dropdown-content button{
+#btncheckout{
     margin:10px;
-    float:right;
+    float: right;
+    width:80px;
 }
 
 .dropbtn {
