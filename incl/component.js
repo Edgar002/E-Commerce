@@ -18,6 +18,7 @@ xmlHttp.onreadystatechange = function() {
 xmlHttp.open("GET", "auth-process.php?action=auth_token", true); // true for asynchronous 
 xmlHttp.send();
 
+el("shoppingList").innerHTML = "";
 var total = localStorage.getItem('total');
 if(total){
     for(var i = 0; i < localStorage.length; i++) {
@@ -94,4 +95,47 @@ el('logoutbtn').onclick = function(e) {
             }
         xmlHttp.open("GET", "auth-process.php?action=logout", true); // true for asynchronous 
         xmlHttp.send();
+}
+
+cartSubmit=function(form){
+    var buyList={};
+    el("shoppingCartList").innerHTML = "";
+    var count = 1;
+    for(var i = 0; i < localStorage.length; i++) {
+        if(localStorage.key(i) != 'total'){
+            var jsonData = JSON.parse(localStorage.getItem(localStorage.key(i)));
+            buyList[localStorage.key(i)]=parseInt(jsonData.value); 
+            el("shoppingCartList").innerHTML += '<li> <input type="hidden"  name="item_name_'+  count +'" value="'+jsonData.name.escapeHTML() +'"/> <input type="hidden"  name="item_number_'+ count+'" value="'+parseInt(jsonData.id) +'"/> <input type="hidden"  name="quantity_'+ count+'" value="'+parseInt(jsonData.value)+'"/>  <input type="hidden"  name="amount_'+ count+'" value="'+parseFloat(jsonData.price) +'"/> </li>';
+            count++;
+        }
+    }
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+            result = xmlHttp.responseText.split('while(1);');
+            result = JSON.parse(result[1]);
+            result = result["success"];	
+            if(result){            
+              
+                myLib.processJSON(
+                    "checkout-process.php",                                     
+                    {action: "handle_checkout", list:JSON.stringify(buyList), userId: result },   
+                    function(returnValue){                                      
+                        form.custom.value=returnValue.digest;
+                        form.invoice.value=returnValue.invoice;
+                        form.submit();    
+                        localStorage.clear();
+                    },
+                    {method:"POST"});   
+                
+            }
+            else{
+                window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/login.php";
+            }		
+        }
+    }            
+    xmlHttp.open("GET", "auth-process.php?action=auth_token", true); // true for asynchronous 
+    xmlHttp.send();
+    
+    return false;
 }

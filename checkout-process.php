@@ -10,41 +10,44 @@
         
         $pid=array();
         $quantity=array();
-        $pidQuantity = "";
         $i = 0;
         
         foreach ($list as $key => $value) {
             $pid[$i]= (int)$key;                      
             $quantity[$i]= (int)$value;
-            $pidQuantity = $pidQuantity.((int)$key). ((int)$value);
             $i++;
         }
        global $db;
         $db = ierg4210_DB();
-        $pidList = implode(', ', $pid);
+        $pidList = implode(',', $pid);
+        $quantityList = implode(',', $quantity);
         $query="SELECT pid , price FROM products WHERE pid IN ($pidList)";
         $products=$db->query($query);
         
         $currency="HKD";
         $email="edgar6a28-facilitator@yahoo.com.hk";
         $salt = mt_rand() . mt_rand();
-        $currentPrice=""; 
+        
+        $price=array();
         $totalPrice=0;   
         
         $i=0;
         foreach($products as $product){
-            $currentPrice=$currentPrice.((float)$product["price"]);
+            $price[$i] = (float)$product["price"];
             $totalPrice += ((float)$product["price"]) * ((int)$quantity[$i++]);
         }
-        $digest=sha1($currency. $email. $salt. $pidQuantity . $currentPrice. $totalPrice);
+
+        $priceList = implode(',', $price);        
+        
+        $digest=sha1($currency. $email. $salt. $pidList.'|'.$quantityList.'|'.$priceList.'|'.(float)$totalPrice);
         
         $db = order_DB();
-        //$query="INSERT INTO orders (digest, tid , salt) VALUES ($digest, "notyet", $salt)";
+        
         $q = $db->prepare("INSERT INTO orders (digest , salt , tid, userid) VALUES (?, ?, ?, ?)");
 
         $q->execute(array($digest , $salt , "notyet", $userId));
         
-        $invoice=$db->lastInsertId();
+        $invoice=$db->lastInsertId() + 200;
         $returnValue=array("digest"=>$digest, "invoice"=>$invoice);
             
         return $returnValue;

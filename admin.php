@@ -127,7 +127,7 @@
 	<fieldset>
 		<legend>Latest 50 Transcation Records</legend>
 		<table id="orderList">
-			<tr><td><span>OrderID</span></td> <td><span>User Account</span></td> <td><span>Digest</span></td> <td><span>Salt</span></td> <td><span>Transaction ID</span></td> </tr>
+			<tr><td><span>OrderID</span></td> <td><span>User Account</span></td> <td><span>Digest</span></td> <td><span>Salt</span></td> <td><span>Transaction ID</span></td> <td><span>Product-List</span></td> </tr>
 		</table>
 	</fieldset>	
 </section>
@@ -155,9 +155,11 @@
 			// loop over the server response json
 			//   the expected format (as shown in Firebug): 
 			for (var listItems = [], i = 0, order; order = json[i]; i++) {
-				if(order.userid == null) order.userid = "Guest";		
-				listItems.push('<tr><td>', parseInt(order.oid) ,'</td> <td>', order.userid.escapeHTML() ,'</td> <td>', order.digest.escapeHTML() ,'</td> <td>', order.salt.escapeHTML() ,'</td> <td>', order.tid.escapeHTML() ,'</td> </tr>');
+				if(order.userid == null) order.userid = "Guest";
+				if(order.productlist == null) order.productlist = "N/A";		
+				listItems.push('<tr><td>', parseInt(order.oid) ,'</td> <td>', order.userid.escapeHTML() ,'</td> <td>', order.digest.escapeHTML() ,'</td> <td>', order.salt.escapeHTML() ,'</td> <td>', order.tid.escapeHTML() ,'</td> <td>', order.productlist.escapeHTML() ,'</td> </tr>');
 			}
+
 
 			el('orderList').innerHTML += listItems.join('');
 		});

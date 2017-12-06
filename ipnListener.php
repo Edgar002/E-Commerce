@@ -54,7 +54,8 @@
 				global $db;
 				$db = order_DB();
 				$q = $db->prepare("SELECT * FROM orders WHERE oid = ? LIMIT 100;");
-				if ($q->execute(array($_POST['invoice'])))
+				$invoice = $_POST['invoice'] - 200;
+				if ($q->execute(array($invoice)))
 					$order=$q->fetchAll();
 				
 				if ($q->rowCount() >= 1 && $order[0]['tid']==$_POST['txn_id'])
@@ -70,27 +71,52 @@
 					break;
 				
 				// Check that payment_amount/payment_currency are correct
-				$pidQuantity = "";
-				$currentPrice = "";
+				$pid=array();
+				$quantity=array();
+				$price=array();
+				
+				
+				$sortArray=array();
+				$sortPrice=array();
+				
 				$i = 1;
 				while ($_POST['item_number'.$i]) {
-					$pidQuantity = $pidQuantity.((int)$_POST['item_number'.$i]). ((int)$_POST['quantity'.$i]);
-					$currentPrice = $currentPrice.((float)$_POST['mc_gross_'.$i]);
+					$sortArray[(int)$_POST['item_number'.$i]] = (int)$_POST['quantity'.$i];
+					$sortPrice[(int)$_POST['item_number'.$i]] = (float)$_POST['mc_gross_'.$i]/ (int)$_POST['quantity'.$i];
 					$i++;
 				}
-				$digest = sha1($_POST['mc_currency']. $_POST['business']. $order[0]['salt']. $pidQuantity . $currentPrice. (float)$_POST['mc_gross']);
-				$q = $db->prepare("UPDATE orders SET tid = ? WHERE oid = ?");
-				$q->execute(array($pidQuantity, 1));
-				$q->execute(array($_POST['mc_currency']. $_POST['business']. $order[0]['salt']. $pidQuantity . $currentPrice. (float)$_POST['mc_gross'], 2));
+
+				ksort($sortArray);
+				ksort($sortPrice);
+				
+				
+				$i = 0;
+				foreach ($sortArray as $key => $value) {
+					$pid[$i]= (int)$key;                      
+					$quantity[$i]= (int)$value;
+					$price[$i]=$sortPrice[(int)$key];
+					$i++;
+				}
+
+
+				$pidList=implode(',', $pid); 
+				$quantityList=implode(',',$quantity); 
+				$priceList = implode(',', $price);  
+				
+				$digest = sha1($_POST['mc_currency']. $_POST['business']. $order[0]['salt']. $pidList.'|'.$quantityList.'|'.$priceList.'|'.(float)$_POST['mc_gross']);
+				//$q = $db->prepare("UPDATE orders SET tid = ? WHERE oid = ?");
+				//$q->execute(array($pidList.'|'.$quantityList.'|'.$priceList.'|', 1));
+				//$q->execute(array($_POST['mc_currency']. $_POST['business']. $order[0]['salt']. $pidList.'|'.$quantityList.'|'.$priceList.'|'. (float)$_POST['mc_gross'], 2));
+				
 				// Process payment
 				if ($digest==$order[0]['digest'])
 				{
-					$q = $db->prepare("UPDATE orders SET tid = ? WHERE oid = ?");
-					$q->execute(array($_POST['txn_id'], $_POST['invoice']));
+					$q = $db->prepare("UPDATE orders SET tid = ? , productlist = ? WHERE oid = ?");
+					$q->execute(array($_POST['txn_id'], $pidList.'|'.$quantityList.'|'.$priceList , $invoice));
 					
 				}else {
-					$q = $db->prepare("UPDATE orders SET tid = ? WHERE oid = ?");
-					$q->execute(array("Wrong Digest", $_POST['invoice']));
+					$q = $db->prepare("UPDATE orders SET tid = ? , productlist = ? WHERE oid = ?");
+					$q->execute(array("Wrong Digest", $pidList.'|'.$quantityList.'|'.$priceList , $invoice));
 				}
 				// If 'VERIFIED', send email of IPN variables and values to specified email address 
 				foreach ($_POST as $key => $value){ 

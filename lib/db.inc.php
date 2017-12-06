@@ -19,7 +19,7 @@ function ierg4210_DB() {
 	return $db;
 }
 function order_DB() {
-	$db = new PDO('sqlite:/var/www/order.db');
+	$db = new PDO('sqlite:/var/www/orders.db');
 	$db->query('PRAGMA foreign_keys = ON;');
 	$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 	return $db;
