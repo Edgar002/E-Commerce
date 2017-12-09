@@ -1,3 +1,15 @@
+var xmlHttp = new XMLHttpRequest();
+xmlHttp.onreadystatechange = function() { 
+    if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+        result = xmlHttp.responseText.split('while(1);');
+        result = JSON.parse(result[1]);
+        result = result["success"];	
+        el("nonce").value = result;
+               
+    }
+}            
+xmlHttp.open("GET", "checkout-process.php?action=csrf_getNonce", false); // true for asynchronous 
+xmlHttp.send();
 
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.onreadystatechange = function() { 
@@ -18,7 +30,7 @@ xmlHttp.onreadystatechange = function() {
 xmlHttp.open("GET", "auth-process.php?action=auth_token", true); // true for asynchronous 
 xmlHttp.send();
 
-el("shoppingList").innerHTML = "";
+
 var total = localStorage.getItem('total');
 if(total){
     for(var i = 0; i < localStorage.length; i++) {
@@ -109,17 +121,21 @@ cartSubmit=function(form){
             count++;
         }
     }
+
+
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
             result = xmlHttp.responseText.split('while(1);');
             result = JSON.parse(result[1]);
             result = result["success"];	
-            if(result){            
+            if(!result){
+                result = "Guest";
+            }	           
               
                 myLib.processJSON(
                     "checkout-process.php",                                     
-                    {action: "handle_checkout", list:JSON.stringify(buyList), userId: result },   
+                    {action: "handle_checkout", list:JSON.stringify(buyList), userId: result , nonce:  form.nonce.value},   
                     function(returnValue){                                      
                         form.custom.value=returnValue.digest;
                         form.invoice.value=returnValue.invoice;
@@ -128,10 +144,7 @@ cartSubmit=function(form){
                     },
                     {method:"POST"});   
                 
-            }
-            else{
-                window.location = "https://secure.s19.ierg4210.ie.cuhk.edu.hk/login.php";
-            }		
+            	
         }
     }            
     xmlHttp.open("GET", "auth-process.php?action=auth_token", true); // true for asynchronous 

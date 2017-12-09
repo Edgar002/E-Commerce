@@ -1,9 +1,14 @@
 <?php
+    session_start();
     include_once('lib/db.inc.php');
     include_once('auth-process.php');
 
     
     function ierg4210_handle_checkout(){
+
+        ierg4210_csrf_verifyNonce($_REQUEST['nonce']);
+        
+
         $list=json_decode($_REQUEST['list']);
         $userId = $_REQUEST['userId'];
         
@@ -54,20 +59,41 @@
       
        
     }
+
+    function ierg4210_csrf_getNonce(){
+        // Generate a nonce with mt_rand()
+        $nonce = mt_rand() . mt_rand();
+        
+        // With regard to $action, save the nonce in $_SESSION 
+        if (!isset($_SESSION['csrf_nonce'])) 
+            $_SESSION['csrf_nonce'] = array();
+        $_SESSION['csrf_nonce']['handle_checkout'] = $nonce;
+        
+        // Return the nonce
+        echo  'while(1);' . json_encode(array('success' => $_SESSION['csrf_nonce']['handle_checkout']));
+        return $nonce;
+    }
+    
+    // Check if the nonce returned by a form matches with the stored one.
+    function ierg4210_csrf_verifyNonce($receivedNonce){
+        // We assume that $REQUEST['action'] is already validated
+        if (isset($receivedNonce) && $_SESSION['csrf_nonce']['handle_checkout'] == $receivedNonce) {
+            if ($_SESSION['t4210']==null)
+                unset($_SESSION['csrf_nonce']['handle_checkout']);
+            return true;
+        }
+        throw new Exception('csrf-attack');
+    }
   
     header('Content-Type: application/json');
 
-    if(!ierg4210_auth_token()){
-		header('Location: login.php');
-		echo 'while(1);false';
-		exit();
-    }
 
 	// input validation
 	if (empty($_REQUEST['action']) || !preg_match('/^\w+$/', $_REQUEST['action'])) {
 		echo json_encode(array('failed'=>'undefined'));
 		exit();
-	}
+    }
+    
 
 	// The following calls the appropriate function based to the request parameter $_REQUEST['action'],
 	// the return values of the functions are then encoded in JSON format and used as output
