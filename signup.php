@@ -20,12 +20,24 @@
             echo 'invalid email or password! <br/><a href="javascript:history.back();">Back to Sign-Up Page.</a>';
             exit();
         }
+
+        global $db;
+        $db = ierg4210_DB();
+    
+        $q=$db->prepare('SELECT * FROM account WHERE email = ?');
+        $q->execute(array($_POST['email']));
+        $record = $q->fetchAll();
+
+
+        if (count($record) >= 1){
+            header('Content-Type: text/html; charset=utf-8');
+            echo 'The email is registered!!! <br/><a href="javascript:history.back();">Back to Sign-Up Page.</a>';
+            exit();
+        }
         
         // Implement the sign-up logic here
         $salt = mt_rand() . mt_rand();
         $saltPassword = hash_hmac('sha1', $_POST['pw'], $salt);
-        global $db;
-        $db = ierg4210_DB();
         $q = $db->prepare("INSERT INTO account (email, password, salt, type) VALUES (?,?,?,?);");
        
         return $q->execute(array($_POST['email'] , $saltPassword, $salt, "user"));

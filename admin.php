@@ -1,8 +1,10 @@
 <?php
 	session_start();
 	include_once('auth-process.php');
+	
 	if($_SERVER['HTTPS']!="on") {
 		header("Location:https://secure.s19.ierg4210.ie.cuhk.edu.hk/admin.php"); 
+		exit();
 	} 
 		
 	if(!ierg4210_auth_token()){
@@ -25,7 +27,7 @@
 <body>
 <div id="headerbar">
 		
-	<h1>Fourth-Dimensional Pocket - Admin Panel</h1>
+	<h1><a href="https://secure.s19.ierg4210.ie.cuhk.edu.hk/main.html">Fourth-Dimensional Pocket - Admin Panel</a></h1>
 	<div id="userInfo">
 			<a href="https://secure.s19.ierg4210.ie.cuhk.edu.hk/user-portal.php"><p id ="username"><?php echo $_SESSION['t4210']['em']?></p></a> 
 			<button id="logoutbtn">Logout</button>
