@@ -57,22 +57,67 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<title>Fourth-Dimensional Pocket - Login Page</title>
-	<link href="incl/login.css" rel="stylesheet" type="text/css"/>
+    <title>Fourth-Dimensional Pocket - Login Page</title>
+    <link href="incl/login.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript">
+        window.fbAsyncInit = function() {
+            FB.init({
+            appId      : '132032470808245',
+            cookie     : true,
+            xfbml      : true,
+            version    : 'v2.11'
+            });
+            
+            FB.AppEvents.logPageView(); 
+            FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+            FB.Event.subscribe('auth.login', function (response) {
+                location.href = 'https://secure.s19.ierg4210.ie.cuhk.edu.hk/main.html';
+            });
+        });  
+        };
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function statusChangeCallback(response) {
+    
+            if (response.status === 'connected') {
+                location.href = 'https://secure.s19.ierg4210.ie.cuhk.edu.hk/main.html';
+            } 
+        }
+
+
+        function checkLoginState() {
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        }
+
+
+    </script>    
 </head>
 <body>
-<h1>Fourth-Dimensional Pocket - Login Page</h1>
+<h1><a href="https://secure.s19.ierg4210.ie.cuhk.edu.hk/main.html">Fourth-Dimensional Pocket - Login Page</a></h1>
 <article id="main">
 <section id="loginPanel">
 	<fieldset>
         <legend>Login</legend>
         <form id="login" method="POST" action="login.php?action=<?php echo ($action = 'login'); ?>">
             
-            <div><label>Email  :</label><input type = "email" name = "email" required:"true"/></div>
-            <div><label>Password  :</label><input type = "password" name = "pw" required:"true"/></div>
+            <div><label>Email  :</label><input type = "email" name = "email" required/></div>
+            <div><label>Password  :</label><input type = "password" name = "pw" required/></div>
             <input type="hidden" name="nonce" value="<?php echo csrf_getNonce($action); ?>"/>
-            <div><input  type="submit" value="Login" /></div>
-            
+            <div id = "loginbtns">
+                <input  id= "loginbtn" type="submit" value="Login" />
+                <button id = "signupbtn" onclick="location.href = 'https://secure.s19.ierg4210.ie.cuhk.edu.hk/signup.php';" type="button">SignUp</button>
+                <div class="fb-login-button" data-max-rows="1" data-size="medium" data-button-type="login_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true"></div>
+                
+            </div>
            
 		</form>
 	</fieldset>

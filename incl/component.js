@@ -1,24 +1,35 @@
+(function(d, s, id){
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));  
+    
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.onreadystatechange = function() { 
     if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
-        result = xmlHttp.responseText.split('while(1);');
-        result = JSON.parse(result[1]);
-        result = result["success"];	
-        el("nonce").value = result;
+        nonce = xmlHttp.responseText.split('while(1);');
+        nonce = JSON.parse(nonce[1]);
+        nonce = nonce["success"];	
+        el("nonce").value = nonce;
                
     }
 }            
 xmlHttp.open("GET", "checkout-process.php?action=csrf_getNonce", false); // true for asynchronous 
 xmlHttp.send();
 
+fbname = null;
 var xmlHttp = new XMLHttpRequest();
 xmlHttp.onreadystatechange = function() { 
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
-                result = xmlHttp.responseText.split('while(1);');
-                result = JSON.parse(result[1]);
-                result = result["success"];	
-                if(result){
-                    el("username").innerHTML = result;
+                
+                userName = xmlHttp.responseText.split('while(1);');
+                userName = JSON.parse(userName[1]);
+                userName = userName["success"];	
+
+                if(userName){
+                    el("username").innerHTML = userName;
                     el('logoutbtn').show();
                 }
                 else{
@@ -27,8 +38,44 @@ xmlHttp.onreadystatechange = function() {
                 }		
             }
 }            
-xmlHttp.open("GET", "auth-process.php?action=auth_token", true); // true for asynchronous 
-xmlHttp.send();
+
+window.fbAsyncInit = function() {
+    FB.init({
+    appId      : '132032470808245',
+    cookie     : true,
+    xfbml      : true,
+    version    : 'v2.11'
+    });
+    
+    FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+            var uid = response.authResponse.userID;
+            FB.api('/'+uid, {fields: 'name'}, function(response) {
+                fbname = response.name;
+                el("username").innerHTML = fbname;
+                el('logoutbtn').show();
+              });
+        }
+        else{
+        xmlHttp.open("GET", "auth-process.php?action=auth_token", true); // true for asynchronous 
+        xmlHttp.send(); }
+      } );
+
+      
+
+};
+
+function fbLogoutUser() {
+        FB.getLoginStatus(function(response) {
+            if (response && response.status === 'connected') {
+                FB.logout(function(response) {
+                    document.location.reload();
+                });
+            }
+        });
+    };
+
+
 
 
 var total = localStorage.getItem('total');
@@ -99,6 +146,9 @@ el('loginbtn').onclick = function(e) {
 }
 
 el('logoutbtn').onclick = function(e) {
+    
+    fbLogoutUser();
+
     var xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = function() { 
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
@@ -129,20 +179,25 @@ cartSubmit=function(form){
             result = xmlHttp.responseText.split('while(1);');
             result = JSON.parse(result[1]);
             result = result["success"];	
+
+            
             if(!result){
-                result = "Guest";
+                if(fbname)
+                    result = fbname;
+                else
+                    result = "Guest";    
             }	           
               
-                myLib.processJSON(
-                    "checkout-process.php",                                     
-                    {action: "handle_checkout", list:JSON.stringify(buyList), userId: result , nonce:  form.nonce.value},   
-                    function(returnValue){                                      
-                        form.custom.value=returnValue.digest;
-                        form.invoice.value=returnValue.invoice;
-                        form.submit();    
-                        localStorage.clear();
-                    },
-                    {method:"POST"});   
+            myLib.processJSON(
+                "checkout-process.php",                                     
+                {action: "handle_checkout", list:JSON.stringify(buyList), userId: result , nonce:  form.nonce.value},   
+                function(returnValue){                                      
+                    form.custom.value=returnValue.digest;
+                    form.invoice.value=returnValue.invoice;
+                    form.submit();    
+                    localStorage.clear();
+                },
+                {method:"POST"});   
                 
             	
         }

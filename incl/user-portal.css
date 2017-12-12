@@ -1,0 +1,29 @@
+fieldset{width:400px}
+form label{clear:left;float:left;width:190px;line-height:29px}
+form div{padding:4px 0}
+form {margin-bottom: 0}
+input[type=password],select,textarea{width:200px}
+
+a {
+    color: #000;
+    text-decoration: none;
+}
+
+#OrderPanel fieldset{width: auto;}
+#orderList {width:100%}
+
+#headerbar > h1 { display:inline-block;margin: auto;}
+#main {margin-top: 25px;}
+#userInfo{position: relative;display: flex;float:right;margin-right: 8px;}
+#username{margin-right: 10px;}
+#logoutbtn{align-self: center;}
+
+.box{width: 200px;}
+
+#signUp{margin:0px}
+
+#UserPanel{float:center;width:350px}
+
+#main{float:center}
+
+.clear{clear:both}

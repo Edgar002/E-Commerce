@@ -1,4 +1,9 @@
 fieldset{width:310px}
+h1 a {
+    color: #000;
+    text-decoration: none;
+}
+
 form label{clear:left;float:left;width:90px;line-height:29px}
 form div{padding:4px 0}
 input[type=email],input[type=password],select,textarea{width:200px}
@@ -11,6 +16,9 @@ input[type=email],input[type=password],select,textarea{width:200px}
 
 #main{float:center}
 
-#loginbtn{margin-top:10px}
+
+#loginbtn{margin-right: 5px;height:28px;}
+#signupbtn{margin-right: 5px;height:28px;}
+#loginbtns{display: flex;width:100%;align-items: center;}
 
 .clear{clear:both}

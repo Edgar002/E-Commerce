@@ -1,0 +1,20 @@
+fieldset{width:370px}
+a {
+    color: #000;
+    text-decoration: none;
+}
+form label{clear:left;float:left;width:150px;line-height:29px}
+form div{padding:4px 0}
+input[type=email],input[type=password],select,textarea{width:200px}
+
+.box{width: 200px;}
+
+#signUp{margin:0px}
+
+#SignUpPanel{float:center;width:350px}
+
+#main{float:center}
+
+#loginbtn{margin-top:10px}
+
+.clear{clear:both}
