@@ -1,5 +1,4 @@
 # e-commerce website
-Tong Pak Hin 1155063629
 
 ## Extension
 1. Supporting Change of Password
